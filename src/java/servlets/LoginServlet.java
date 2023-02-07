@@ -23,7 +23,7 @@ public class LoginServlet extends HttpServlet {
         if (logout != null) {
             session.invalidate();
             String message = "You have successfully logged out";
-            request.setAttribute("error",message);
+            request.setAttribute("error", message);
             getServletContext().getRequestDispatcher("/WEB-INF/login.jsp")
                 .forward(request, response);
         } else {
