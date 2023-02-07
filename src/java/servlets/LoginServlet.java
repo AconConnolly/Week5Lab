@@ -1,6 +1,7 @@
 
 package servlets;
 
+import User.User;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -15,69 +16,47 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        getServletContext().getRequestDispatcher("/WEB-INF/login.jsp")
+        
+        HttpSession session = request.getSession();
+        String logout = request.getParameter("logout");
+        
+        if (logout != null) {
+            session.invalidate();
+            String message = "You have successfully logged out";
+            request.setAttribute("error",message);
+            getServletContext().getRequestDispatcher("/WEB-INF/login.jsp")
                 .forward(request, response);
-     //Log out the user
-     //If the parameter "logout" exists, invalidate tyhe sessions and display message
+        } else {
+            getServletContext().getRequestDispatcher("/WEB-INF/login.jsp")
+                .forward(request, response);
+        }
+  
     }
 
-    
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-        User user = new User(username,password);
+        HttpSession session = request.getSession();
         
-        if (username.equals(" ") || password.equals(" ")) {
-            getServletContext().getRequestDispatcher("/WEB-INF/login.jsp")
-                .forward(request, response);
+        if (username != "" && password != "") {
+            if (User.login(username, password) == null){
+                request.setAttribute("username",username);
+                request.setAttribute("password",password);
+                String error = "Invalid Login";
+                request.setAttribute("error",error);
+                getServletContext().getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
+            } else {
+                session.setAttribute("user",username);
+                getServletContext().getRequestDispatcher("/WEB-INF/home.jsp").forward(request,response);
+            }
         }
-//        } else {
-//            login(username, password);
-//        }
-        
-        if (user != null) {
-            HttpSession session = request.getSession();
-            session.setAttribute("user",user);
-        } else {
-            request.setAttribute("error", "User is invalid");
+        else {
+            
+            getServletContext().getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
         }
-        request.getRequestDispatcher("/home.jsp").forward(request,response);
-        
-      
-      //Process form from doGet
-      //Validate that username and password are not empty
-      //Pass username and password to the login() method from AccountService.
-      //If login returns null -> redirect home
-      //If invalid -> error message (keep fields filled and redirect home)
-    
-    }
-//    public User login (String username, String password) {
-//        
-//        if (username != null || password != null) {
-//             
-//            return null;
-//        } else {
-//            return username;
-//        }
-//    }
-//    
-    
-    
-
-}
-
-public class User {
-    private String username;
-    private String password;
-    
-    public User() {}
-
-    public User(String username, String password) {
-
-            this.username = username;
-            this.password = password; 
-        }
+            
+                
+    } 
 }

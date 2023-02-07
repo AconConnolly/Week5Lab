@@ -13,7 +13,7 @@
     </head>
     <body>
         <h1>Home Page</h1>
-        <h2>Hello ${username}</h2>
-        <a href="LoginServlet">Log out</a>
+        <h2>Hello ${user}</h2>
+        <a href="login">Log out</a>
     </body>
 </html>
